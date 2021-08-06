@@ -1,0 +1,5 @@
+{
+  "scripts": {
+    "dev": "pnpm run --recursive --parallel dev"
+  }
+}
