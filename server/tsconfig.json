@@ -4,7 +4,8 @@
     "target": "es2020",
     "esModuleInterop": true,
     "strict": true,
-    "noUnusedLocals": true
+    "noUnusedLocals": true,
+    "noFallthroughCasesInSwitch": true
   },
   "include": ["src", "../shared"]
 }
