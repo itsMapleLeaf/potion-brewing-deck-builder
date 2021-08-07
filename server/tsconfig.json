@@ -1,11 +1,8 @@
 {
+  "extends": "../tsconfig.json",
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es2020",
-    "esModuleInterop": true,
-    "strict": true,
-    "noUnusedLocals": true,
-    "noFallthroughCasesInSwitch": true
+    "target": "es2020"
   },
   "include": ["src", "../shared"]
 }
