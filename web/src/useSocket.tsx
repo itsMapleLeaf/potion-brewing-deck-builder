@@ -1,21 +1,18 @@
 import * as React from "react"
-import {
-  MessageToClient,
-  MessageToServer,
-  SocketState,
-} from "../../shared/socket"
+import { MessageToClient, MessageToServer } from "../../shared/socket"
 import { useEffectRef } from "./useEffectRef"
 
 type UseSocketConfig = {
   url: string
-  onMessage?: (data: MessageToClient) => void
+  onOpen: () => void
+  onClose: () => void
+  onMessage: (data: MessageToClient) => void
 }
 
 type Status = "connecting" | "online" | "willRetry"
 
 export function useSocket(config: UseSocketConfig) {
   const [status, setStatus] = React.useState<Status>("connecting")
-  const [state, setState] = React.useState<SocketState>({ count: 0 })
   const socketRef = React.useRef<WebSocket>()
   const configRef = useEffectRef(config)
 
@@ -25,22 +22,22 @@ export function useSocket(config: UseSocketConfig) {
 
       socket.addEventListener("open", () => {
         setStatus("online")
+        configRef.current.onOpen()
       })
 
       socket.addEventListener("error", () => {
         setStatus("willRetry")
+        configRef.current.onClose()
       })
 
       socket.addEventListener("close", () => {
         setStatus("willRetry")
+        configRef.current.onClose()
       })
 
       socket.addEventListener("message", (event: MessageEvent<string>) => {
         const data: MessageToClient = JSON.parse(event.data)
-        configRef.current.onMessage?.(data)
-        if (data.type === "newState") {
-          setState(data.state)
-        }
+        configRef.current.onMessage(data)
       })
     }
 
@@ -69,5 +66,5 @@ export function useSocket(config: UseSocketConfig) {
     socketRef.current?.send(JSON.stringify(data))
   }
 
-  return { state, status, send }
+  return { send }
 }
