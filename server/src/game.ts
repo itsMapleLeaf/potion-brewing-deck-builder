@@ -1,45 +1,46 @@
 import { randomUUID } from "node:crypto"
 import type { SocketRoomState } from "../../shared/socket"
-import type { GameSocket, GameSocketServer } from "./main"
+import type { GameSocket, GameSocketServer } from "./types"
 
-const games = new Map<string, Game>()
+export class GameManager {
+  private games = new Map<string, Game>()
+  private server: GameSocketServer
 
-export type Game = {
-  roomId: string
-  state: SocketRoomState
-}
-
-export function createGame(): Game {
-  const game: Game = {
-    roomId: randomUUID(),
-    state: {
-      count: 0,
-    },
+  constructor(server: GameSocketServer) {
+    this.server = server
   }
-  games.set(game.roomId, game)
-  return game
+
+  create(): Game {
+    const game = new Game(this.server)
+    this.games.set(game.roomId, game)
+    return game
+  }
+
+  get(roomId: string): Game | undefined {
+    return this.games.get(roomId)
+  }
 }
 
-export function getGame(roomId: string): Game | undefined {
-  return games.get(roomId)
-}
+export class Game {
+  readonly roomId = randomUUID()
+  private state: SocketRoomState = { count: 0 }
+  private server: GameSocketServer
 
-export function addClientToGame(roomId: string, client: GameSocket): void {
-  const game = getGame(roomId)
-  if (!game) return
+  constructor(server: GameSocketServer) {
+    this.server = server
+  }
 
-  client.join(roomId)
-  client.emit("joined-room", roomId, game.state)
-}
+  addClient(client: GameSocket): void {
+    client.join(this.roomId)
+    client.emit("joined-room", this.roomId, this.state)
+  }
 
-export function updateGameState(
-  roomId: string,
-  server: GameSocketServer,
-  update: (state: SocketRoomState) => void
-): void {
-  const game = getGame(roomId)
-  if (!game) return
+  removeClient(client: GameSocket): void {
+    client.leave(this.roomId)
+  }
 
-  update(game.state)
-  server.to(game.roomId).emit("new-state", game.state)
+  updateState(mutate: (state: SocketRoomState) => void): void {
+    mutate(this.state)
+    this.server.to(this.roomId).emit("new-state", this.state)
+  }
 }
