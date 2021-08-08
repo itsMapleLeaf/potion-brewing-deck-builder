@@ -1,99 +1,58 @@
 import { randomUUID } from "node:crypto"
-import WebSocket from "ws"
-import { isTruthy } from "../../shared/helpers"
-import {
-  MessageToClient,
-  MessageToServer,
+import { Server } from "socket.io"
+import type {
+  MessageToClientMap,
+  MessageToServerMap,
   SocketRoomState,
 } from "../../shared/socket"
 
-type Room = {
-  players: Set<string>
+type Game = {
+  roomId: string
   state: SocketRoomState
 }
+const games = new Map<string, Game>()
 
-type Player = {
-  id: string
-  socket: WebSocket
-}
+const server = new Server<MessageToServerMap, MessageToClientMap>()
 
-function sendMessage(socket: WebSocket, message: MessageToClient) {
-  socket.send(JSON.stringify(message))
-}
+server.on("connection", (client) => {
+  let game: Game | undefined
 
-const rooms: Record<string, Room> = {}
-const players: Record<string, Player> = {}
+  client.on("create-room", () => {
+    const roomId = randomUUID()
 
-const port = Number(process.env.PORT) || 8080
-const server = new WebSocket.Server({ port }, () => {
-  console.log(`Server listening on http://localhost:${port}`)
-})
-
-server.on("connection", (socket) => {
-  const self: Player = {
-    id: randomUUID(),
-    socket,
-  }
-
-  players[self.id] = self
-
-  let room: Room | undefined
-
-  socket.on("message", (data) => {
-    const message: MessageToServer = JSON.parse(data.toString())
-
-    switch (message.type) {
-      case "createRoom": {
-        const roomId = randomUUID()
-
-        room = rooms[roomId] = {
-          state: { count: 0 },
-          players: new Set([self.id]),
-        }
-
-        sendMessage(socket, { type: "joinedRoom", roomId })
-        sendMessage(socket, { type: "newState", state: room.state })
-        break
-      }
-
-      case "joinRoom": {
-        room = rooms[message.roomId]
-
-        if (!room) {
-          sendMessage(socket, { type: "joinedRoom:roomDoesNotExist" })
-          break
-        }
-
-        room.players.add(self.id)
-        sendMessage(socket, { type: "joinedRoom", roomId: message.roomId })
-        sendMessage(socket, { type: "newState", state: room.state })
-        break
-      }
-
-      case "increment": {
-        if (!room) break
-
-        room.state.count++
-
-        const playersInRoom = [...room.players]
-          .map((id) => players[id])
-          .filter(isTruthy)
-
-        for (const player of playersInRoom) {
-          sendMessage(player.socket, { type: "newState", state: room.state })
-        }
-
-        break
-      }
+    game = {
+      roomId,
+      state: { count: 0 },
     }
+
+    games.set(roomId, game)
+    client.join(roomId)
+    client.emit("joined-room", roomId, game.state)
   })
 
-  socket.on("close", () => {
-    delete players[self.id]
-    room?.players.delete(self.id)
+  client.on("join-room", (roomId) => {
+    game = games.get(roomId)
+
+    if (!game) {
+      client.emit("joined-room:room-not-found")
+      return
+    }
+
+    client.join(roomId)
+    client.emit("joined-room", roomId, game.state)
+  })
+
+  client.on("increment", () => {
+    if (!game) return
+
+    game.state.count += 1
+
+    server.to(game.roomId).emit("new-state", game.state)
   })
 })
 
-server.on("error", (error) => {
-  console.error("socket error", error)
+server.listen(Number(process.env.PORT) || 8080, {
+  cors: {
+    origin: "*",
+  },
 })

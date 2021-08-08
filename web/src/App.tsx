@@ -1,40 +1,50 @@
 import * as React from "react"
-import { SocketRoomState } from "../../shared/socket"
-import { useSocket } from "./useSocket"
+import type { SocketRoomState } from "../../shared/socket"
+import { useSocketIoClient } from "./useSocketIoClient"
 
 type AppState =
   | { status: "connecting" }
   | { status: "home" }
+  | { status: "error" }
   | { status: "joiningRoom" }
   | { status: "room"; roomId: string; state: SocketRoomState }
 
 export function App() {
   const [state, setState] = React.useState<AppState>({ status: "connecting" })
 
-  const socket = useSocket({
+  const socket = useSocketIoClient({
     url: "ws://localhost:8080/",
-    onOpen() {
-      setState({ status: "home" })
-    },
-    onClose() {
-      setState({ status: "connecting" })
-    },
-    onMessage(message) {
-      if (message.type === "joinedRoom") {
+    events: {
+      "connect": () => {
+        setState({ status: "home" })
+      },
+
+      "connect_error": () => {
+        setState({ status: "error" })
+      },
+
+      "disconnect": () => {
+        setState({ status: "connecting" })
+      },
+
+      "joined-room": (roomId, state) => {
         setState({
           status: "room",
-          roomId: message.roomId,
-          state: { count: 0 },
+          roomId,
+          state,
         })
-      }
-      if (message.type === "joinedRoom:roomDoesNotExist") {
+      },
+
+      "joined-room:room-not-found": () => {
         setState({ status: "home" })
-      }
-      if (message.type === "newState") {
-        setState((state) =>
-          state.status === "room" ? { ...state, state: message.state } : state
-        )
-      }
+      },
+
+      "new-state": (newState) => {
+        setState((state) => {
+          if (state.status !== "room") return state
+          return { ...state, state: newState }
+        })
+      },
     },
   })
 
@@ -42,12 +52,16 @@ export function App() {
     return <p>Connecting...</p>
   }
 
+  if (state.status === "error") {
+    return <p>Error connecting to server</p>
+  }
+
   if (state.status === "home") {
     return (
       <>
         <button
           onClick={() => {
-            socket.send({ type: "createRoom" })
+            socket.send("create-room")
             setState({ status: "joiningRoom" })
           }}
         >
@@ -57,7 +71,7 @@ export function App() {
           onClick={() => {
             const roomId = prompt("Room ID?")
             if (roomId) {
-              socket.send({ type: "joinRoom", roomId })
+              socket.send("join-room", roomId)
               setState({ status: "joiningRoom" })
             }
           }}
@@ -76,11 +90,7 @@ export function App() {
     return (
       <>
         <p>room ID: {state.roomId}</p>
-        <button
-          onClick={() => {
-            socket.send({ type: "increment" })
-          }}
-        >
+        <button onClick={() => socket.send("increment")}>
           {state.state.count}
         </button>
       </>

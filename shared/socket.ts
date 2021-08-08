@@ -2,12 +2,14 @@ export type SocketRoomState = {
   count: number
 }
 
-export type MessageToServer =
-  | { type: "createRoom" }
-  | { type: "joinRoom"; roomId: string }
-  | { type: "increment" }
+export type MessageToServerMap = {
+  "create-room": () => void
+  "join-room": (roomId: string) => void
+  "increment": () => void
+}
 
-export type MessageToClient =
-  | { type: "joinedRoom"; roomId: string }
-  | { type: "joinedRoom:roomDoesNotExist" }
-  | { type: "newState"; state: SocketRoomState }
+export type MessageToClientMap = {
+  "joined-room": (roomId: string, state: SocketRoomState) => void
+  "joined-room:room-not-found": () => void
+  "new-state": (state: SocketRoomState) => void
+}
