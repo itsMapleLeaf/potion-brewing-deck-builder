@@ -1,53 +1,42 @@
-import { randomUUID } from "node:crypto"
+import type { Socket } from "socket.io"
 import { Server } from "socket.io"
 import type {
   MessageToClientMap,
   MessageToServerMap,
-  SocketRoomState,
 } from "../../shared/socket"
+import type { Game } from "./game"
+import { addClientToGame, createGame, getGame, updateGameState } from "./game"
 
-type Game = {
-  roomId: string
-  state: SocketRoomState
-}
-const games = new Map<string, Game>()
+export type GameSocketServer = Server<MessageToServerMap, MessageToClientMap>
+export type GameSocket = Socket<MessageToServerMap, MessageToClientMap>
 
-const server = new Server<MessageToServerMap, MessageToClientMap>()
+const server: GameSocketServer = new Server()
 
 server.on("connection", (client) => {
   let game: Game | undefined
 
   client.on("create-room", () => {
-    const roomId = randomUUID()
-
-    game = {
-      roomId,
-      state: { count: 0 },
-    }
-
-    games.set(roomId, game)
-    client.join(roomId)
-    client.emit("joined-room", roomId, game.state)
+    game = createGame()
+    addClientToGame(game.roomId, client)
   })
 
   client.on("join-room", (roomId) => {
-    game = games.get(roomId)
+    game = getGame(roomId)
 
     if (!game) {
       client.emit("joined-room:room-not-found")
       return
     }
 
-    client.join(roomId)
-    client.emit("joined-room", roomId, game.state)
+    addClientToGame(roomId, client)
   })
 
   client.on("increment", () => {
     if (!game) return
 
-    game.state.count += 1
-
-    server.to(game.roomId).emit("new-state", game.state)
+    updateGameState(game.roomId, server, (state) => {
+      state.count += 1
+    })
   })
 })
 
