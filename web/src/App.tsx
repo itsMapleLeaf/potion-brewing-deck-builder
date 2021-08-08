@@ -1,6 +1,6 @@
 import * as React from "react"
 import type { SocketRoomState } from "../../shared/socket"
-import { useSocketIoClient } from "./useSocketIoClient"
+import { useSocketActions, useSocketListener } from "./socket"
 
 type AppState =
   | { status: "connecting" }
@@ -11,40 +11,34 @@ type AppState =
 
 export function App() {
   const [state, setState] = React.useState<AppState>({ status: "connecting" })
+  const { send } = useSocketActions()
 
-  const socket = useSocketIoClient({
-    url: "ws://localhost:8080/",
-    events: {
-      "connect": () => {
-        setState({ status: "home" })
-      },
+  useSocketListener({
+    "connect"() {
+      setState({ status: "home" })
+    },
 
-      "connect_error": () => {
-        setState({ status: "error" })
-      },
+    "connect_error"() {
+      setState({ status: "error" })
+    },
 
-      "disconnect": () => {
-        setState({ status: "connecting" })
-      },
+    "disconnect"() {
+      setState({ status: "connecting" })
+    },
 
-      "joined-room": (roomId, state) => {
-        setState({
-          status: "room",
-          roomId,
-          state,
-        })
-      },
+    "joined-room"(roomId, state) {
+      setState({ status: "room", roomId, state })
+    },
 
-      "joined-room:room-not-found": () => {
-        setState({ status: "home" })
-      },
+    "joined-room:room-not-found"() {
+      setState({ status: "home" })
+    },
 
-      "new-state": (newState) => {
-        setState((state) => {
-          if (state.status !== "room") return state
-          return { ...state, state: newState }
-        })
-      },
+    "new-state"(newState) {
+      setState((state) => {
+        if (state.status !== "room") return state
+        return { ...state, state: newState }
+      })
     },
   })
 
@@ -61,7 +55,7 @@ export function App() {
       <>
         <button
           onClick={() => {
-            socket.send("create-room")
+            send("create-room")
             setState({ status: "joiningRoom" })
           }}
         >
@@ -71,7 +65,7 @@ export function App() {
           onClick={() => {
             const roomId = prompt("Room ID?")
             if (roomId) {
-              socket.send("join-room", roomId)
+              send("join-room", roomId)
               setState({ status: "joiningRoom" })
             }
           }}
@@ -90,9 +84,7 @@ export function App() {
     return (
       <>
         <p>room ID: {state.roomId}</p>
-        <button onClick={() => socket.send("increment")}>
-          {state.state.count}
-        </button>
+        <button onClick={() => send("increment")}>{state.state.count}</button>
       </>
     )
   }
