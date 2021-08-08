@@ -35,10 +35,6 @@ export class Game {
     client.emit("joined-room", this.roomId, this.state)
   }
 
-  removeClient(client: GameSocket): void {
-    client.leave(this.roomId)
-  }
-
   updateState(mutate: (state: SocketRoomState) => void): void {
     mutate(this.state)
     this.server.to(this.roomId).emit("new-state", this.state)

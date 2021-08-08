@@ -28,10 +28,6 @@ server.on("connection", (client) => {
       state.count += 1
     })
   })
-
-  client.on("disconnect", () => {
-    game?.removeClient(client)
-  })
 })
 
 server.listen(Number(process.env.PORT) || 8080, {
