@@ -3,6 +3,7 @@ import type { SocketRoomState } from "../../shared/socket"
 import { useSocketActions, useSocketListener } from "./socket"
 
 type AppState =
+  | { status: "init" }
   | { status: "connecting" }
   | { status: "home" }
   | { status: "error" }
@@ -10,8 +11,26 @@ type AppState =
   | { status: "room"; roomId: string; state: SocketRoomState }
 
 export function App() {
-  const [state, setState] = React.useState<AppState>({ status: "connecting" })
+  const [state, setState] = React.useState<AppState>({ status: "init" })
   const { send } = useSocketActions()
+
+  React.useEffect(() => {
+    const roomUrlMatch = /^#\/room\/(.+)/.exec(window.location.hash)
+    const roomId = roomUrlMatch?.[1]
+    if (roomId) {
+      send("join-room", roomId)
+      setState({ status: "joiningRoom" })
+      return
+    }
+
+    setState({ status: "home" })
+  }, [send])
+
+  React.useEffect(() => {
+    if (state.status === "room") {
+      window.location.hash = `/room/${state.roomId}`
+    }
+  })
 
   useSocketListener({
     "connect"() {
@@ -61,17 +80,6 @@ export function App() {
         >
           Create room
         </button>
-        <button
-          onClick={() => {
-            const roomId = prompt("Room ID?")
-            if (roomId) {
-              send("join-room", roomId)
-              setState({ status: "joiningRoom" })
-            }
-          }}
-        >
-          Join room
-        </button>
       </>
     )
   }
@@ -89,5 +97,5 @@ export function App() {
     )
   }
 
-  return null
+  return <p>Loading...</p>
 }
