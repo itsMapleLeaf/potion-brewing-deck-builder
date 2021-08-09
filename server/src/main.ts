@@ -1,9 +1,15 @@
+import * as http from "node:http"
 import { Server } from "socket.io"
 import type { Game } from "./game"
 import { GameManager } from "./game"
 import type { GameSocketServer } from "./types"
 
-const server: GameSocketServer = new Server()
+const httpServer = new http.Server()
+
+const server: GameSocketServer = new Server(httpServer, {
+  cors: { origin: "*" },
+})
+
 const gameManager = new GameManager(server)
 
 server.on("connection", (client) => {
@@ -30,8 +36,7 @@ server.on("connection", (client) => {
   })
 })
 
-server.listen(Number(process.env.PORT) || 8080, {
-  cors: {
-    origin: "*",
-  },
+const port = Number(process.env.PORT) || 8080
+httpServer.listen(port, () => {
+  console.log(`Server listening on ws://localhost:${8080}`)
 })
