@@ -1,15 +1,16 @@
 import type * as http from "node:http"
 import { Server } from "socket.io"
 import type { Game } from "./game"
-import { GameManager } from "./game"
+import type { GameManager } from "./game"
 import type { GameSocketServer } from "./types"
 
-export function attachSocketServer(httpServer: http.Server) {
+export function attachSocketServer(
+  httpServer: http.Server,
+  gameManager: GameManager
+) {
   const server: GameSocketServer = new Server(httpServer, {
     cors: { origin: "*" },
   })
-
-  const gameManager = new GameManager(server)
 
   server.on("connection", (client) => {
     let game: Game | undefined
@@ -29,7 +30,7 @@ export function attachSocketServer(httpServer: http.Server) {
     })
 
     client.on("increment", () => {
-      game?.updateState((state) => {
+      game?.updateState(server, (state) => {
         state.count += 1
       })
     })

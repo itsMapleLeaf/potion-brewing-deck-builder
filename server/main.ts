@@ -1,16 +1,21 @@
-import express from "express"
+import expressStaticGzip from "express-static-gzip"
 import * as http from "node:http"
 import { join } from "node:path"
 import { createExpressApp } from "./express-app"
+import { GameManager } from "./game"
 import { attachSocketServer } from "./socket-server"
+
+const gameManager = new GameManager()
 
 const port = Number(process.env.PORT) || 3000
 
 async function createHttpServer() {
-  const app = createExpressApp()
+  const app = createExpressApp(gameManager)
 
   if (process.env.NODE_ENV === "production") {
-    app.use(express.static(join(__dirname, "../dist")))
+    app.use(
+      expressStaticGzip(join(__dirname, "../dist"), { enableBrotli: true })
+    )
 
     app.get("*", (req, res) => {
       res.sendFile(join(__dirname, "../dist/index.html"))
@@ -29,7 +34,7 @@ async function createHttpServer() {
 }
 
 createHttpServer().then((server) => {
-  attachSocketServer(server)
+  attachSocketServer(server, gameManager)
   server.listen(port, () => {
     console.log(`Server running on http://localhost:${port}`)
   })
