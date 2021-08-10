@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import type { SocketRoomState } from "../../shared/socket"
+import type { SocketRoomState } from "../shared/socket"
 import { useSocketActions, useSocketListener } from "./socket"
 
 type AppState =

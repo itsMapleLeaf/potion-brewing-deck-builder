@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto"
-import type { SocketRoomState } from "../../shared/socket"
+import type { SocketRoomState } from "../shared/socket"
 import type { GameSocket, GameSocketServer } from "./types"
 
 export class GameManager {

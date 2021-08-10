@@ -5,10 +5,7 @@ import type {
   EventNames,
   EventParams,
 } from "socket.io-client/build/typed-events"
-import type {
-  MessageToClientMap,
-  MessageToServerMap,
-} from "../../shared/socket"
+import type { MessageToClientMap, MessageToServerMap } from "../shared/socket"
 
 type ClientSocket = Socket<MessageToClientMap, MessageToServerMap>
 

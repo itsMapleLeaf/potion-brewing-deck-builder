@@ -5,10 +5,7 @@ import type {
   EventNames,
   EventParams,
 } from "socket.io-client/build/typed-events"
-import type {
-  MessageToClientMap,
-  MessageToServerMap,
-} from "../../shared/socket"
+import type { MessageToClientMap, MessageToServerMap } from "../shared/socket"
 
 type ClientSocket = Socket<MessageToClientMap, MessageToServerMap>
 
@@ -27,7 +24,7 @@ export function SocketProvider({ children }: { children: React.ReactNode }) {
   const [socket, setSocket] = useState<ClientSocket>()
 
   useEffect(() => {
-    const socket = createSocket("ws://localhost:8080/")
+    const socket = createSocket()
     setSocket(socket)
     return () => {
       socket.close()

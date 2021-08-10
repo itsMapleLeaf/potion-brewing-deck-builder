@@ -1,9 +1,31 @@
 {
+  "private": true,
   "scripts": {
-    "dev": "pnpm run --recursive --parallel dev",
-    "lint": "eslint --ext js,ts,tsx ."
+    "dev": "node -r esbuild-register ./server/main.ts",
+    "build": "tsc && vite build",
+    "start": "cross-env NODE_ENV=production node -r esbuild-register ./server/main.ts"
+  },
+  "dependencies": {
+    "cross-env": "7.0.3",
+    "express": "4.17.1",
+    "react": "^17.0.0",
+    "react-dom": "^17.0.0",
+    "socket.io": "4.1.3",
+    "socket.io-client": "4.1.3",
+    "ws": "8.0.0",
+    "esbuild-register": "2.6.0"
   },
   "devDependencies": {
+    "@types/express": "4.17.1",
+    "@types/node": "16.4.13",
+    "@types/nodemon": "1.19.1",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "@types/ws": "7.4.7",
+    "@vitejs/plugin-react-refresh": "^1.3.1",
+    "nodemon": "2.0.12",
+    "typescript": "^4.4.0-beta",
+    "vite": "^2.4.4",
     "@typescript-eslint/eslint-plugin": "4.29.0",
     "@typescript-eslint/parser": "4.29.0",
     "eslint": "7.32.0",
