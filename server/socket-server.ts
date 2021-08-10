@@ -4,7 +4,7 @@ import type { Game } from "./game"
 import { GameManager } from "./game"
 import type { GameSocketServer } from "./types"
 
-export function createSocketServer(httpServer: http.Server) {
+export function attachSocketServer(httpServer: http.Server) {
   const server: GameSocketServer = new Server(httpServer, {
     cors: { origin: "*" },
   })

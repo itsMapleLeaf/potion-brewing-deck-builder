@@ -1,4 +1,4 @@
-import { routes, useRoute } from "./router"
+import { useRoute } from "./router"
 
 export function App() {
   const route = useRoute()
@@ -14,7 +14,7 @@ export function App() {
 function HomePage() {
   return (
     <>
-      <a {...routes.game({ gameId: "123" }).link}>Create Game</a>
+      <a href="/create-game">Create Game</a>
     </>
   )
 }

@@ -1,25 +1,36 @@
+import express from "express"
 import * as http from "node:http"
 import { join } from "node:path"
-import sirv from "sirv"
-import { createSocketServer } from "./socket-server"
+import { createExpressApp } from "./express-app"
+import { attachSocketServer } from "./socket-server"
 
 const port = Number(process.env.PORT) || 3000
 
-;(async () => {
-  try {
-    if (process.env.NODE_ENV === "production") {
-      const server = http.createServer(sirv(join(__dirname, "../dist")))
-      createSocketServer(server)
-      await new Promise<void>((resolve) => server.listen(port, resolve))
-      console.log(`Server running at http://localhost:${port}`)
-    } else {
-      const vite = await import("vite")
-      const server = await vite.createServer()
-      createSocketServer(server.httpServer as http.Server)
-      await server.listen(port)
-    }
-  } catch (error) {
-    console.error(`Error starting server`)
-    console.error(error)
+async function createHttpServer() {
+  const app = createExpressApp()
+
+  if (process.env.NODE_ENV === "production") {
+    app.use(express.static(join(__dirname, "../dist")))
+
+    app.get("*", (req, res) => {
+      res.sendFile(join(__dirname, "../dist/index.html"))
+    })
+  } else {
+    const vite = await import("vite")
+
+    const viteServer = await vite.createServer({
+      server: { middlewareMode: "html" },
+    })
+
+    app.use(viteServer.middlewares)
   }
-})()
+
+  return http.createServer(app)
+}
+
+createHttpServer().then((server) => {
+  attachSocketServer(server)
+  server.listen(port, () => {
+    console.log(`Server running on http://localhost:${port}`)
+  })
+})
