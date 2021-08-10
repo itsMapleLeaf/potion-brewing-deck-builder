@@ -1,4 +1,4 @@
-import * as React from "react"
+import { useEffect, useState } from "react"
 import type { SocketRoomState } from "../../shared/socket"
 import { useSocketActions, useSocketListener } from "./socket"
 
@@ -11,10 +11,10 @@ type AppState =
   | { status: "room"; roomId: string; state: SocketRoomState }
 
 export function App() {
-  const [state, setState] = React.useState<AppState>({ status: "init" })
+  const [state, setState] = useState<AppState>({ status: "init" })
   const { send } = useSocketActions()
 
-  React.useEffect(() => {
+  useEffect(() => {
     const roomUrlMatch = /^#\/room\/(.+)/.exec(window.location.hash)
     const roomId = roomUrlMatch?.[1]
     if (roomId) {
@@ -26,7 +26,7 @@ export function App() {
     setState({ status: "home" })
   }, [send])
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (state.status === "room") {
       window.location.hash = `/room/${state.roomId}`
     }
@@ -91,7 +91,6 @@ export function App() {
   if (state.status === "room") {
     return (
       <>
-        <p>room ID: {state.roomId}</p>
         <button onClick={() => send("increment")}>{state.state.count}</button>
       </>
     )
