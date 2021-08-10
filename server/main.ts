@@ -11,13 +11,13 @@ const port = Number(process.env.PORT) || 3000
       const server = http.createServer(sirv(join(__dirname, "../dist")))
       createSocketServer(server)
       await new Promise<void>((resolve) => server.listen(port, resolve))
+      console.log(`Server running at http://localhost:${port}`)
     } else {
       const vite = await import("vite")
       const server = await vite.createServer()
       createSocketServer(server.httpServer as http.Server)
       await server.listen(port)
     }
-    console.log(`Server running at http://localhost:${port}`)
   } catch (error) {
     console.error(`Error starting server`)
     console.error(error)
