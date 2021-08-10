@@ -26,11 +26,12 @@ export function App() {
     setState({ status: "home" })
   }, [send])
 
+  const roomId = state.status === "room" ? state.roomId : undefined
   useEffect(() => {
-    if (state.status === "room") {
-      window.location.hash = `/room/${state.roomId}`
+    if (roomId) {
+      window.location.hash = `/room/${roomId}`
     }
-  })
+  }, [roomId])
 
   useSocketListener({
     "connect"() {
