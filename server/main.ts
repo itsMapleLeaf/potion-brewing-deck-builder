@@ -1,4 +1,6 @@
 import * as http from "node:http"
+import { join } from "node:path"
+import sirv from "sirv"
 import { createSocketServer } from "./socket-server"
 
 const port = Number(process.env.PORT) || 3000
@@ -6,7 +8,7 @@ const port = Number(process.env.PORT) || 3000
 ;(async () => {
   try {
     if (process.env.NODE_ENV === "production") {
-      const server = http.createServer()
+      const server = http.createServer(sirv(join(__dirname, "../dist")))
       createSocketServer(server)
       await new Promise<void>((resolve) => server.listen(port, resolve))
     } else {
