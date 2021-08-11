@@ -1,14 +1,14 @@
 export type BoardSpace = {
   shopPoints: number
-  victoryPoints?: number
+  victoryPoints: number
   hasRuby?: boolean
 }
 
 export const boardSpaces: BoardSpace[] = [
-  { shopPoints: 1 },
-  { shopPoints: 2 },
-  { shopPoints: 3 },
-  { shopPoints: 4 },
+  { shopPoints: 1, victoryPoints: 0 },
+  { shopPoints: 2, victoryPoints: 0 },
+  { shopPoints: 3, victoryPoints: 0 },
+  { shopPoints: 4, victoryPoints: 0 },
   { shopPoints: 5, victoryPoints: 0, hasRuby: true },
   { shopPoints: 6, victoryPoints: 1 },
   { shopPoints: 7, victoryPoints: 1 },
