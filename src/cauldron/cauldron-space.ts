@@ -1,10 +1,10 @@
-export type CauldronSpaceInfo = {
+export type CauldronSpace = {
   shopPoints: number
   victoryPoints: number
   hasRuby?: boolean
 }
 
-export const cauldronSpaces: CauldronSpaceInfo[] = [
+export const cauldronSpaces: CauldronSpace[] = [
   { shopPoints: 1, victoryPoints: 0 },
   { shopPoints: 2, victoryPoints: 0 },
   { shopPoints: 3, victoryPoints: 0 },

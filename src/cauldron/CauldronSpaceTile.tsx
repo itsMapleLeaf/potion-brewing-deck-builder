@@ -1,10 +1,10 @@
-import type { CauldronSpaceInfo } from "./cauldron-spaces"
+import type { CauldronSpace } from "./cauldron-space"
 
 export function CauldronSpaceTile({
   space,
   children,
 }: {
-  space: CauldronSpaceInfo
+  space: CauldronSpace
   children: React.ReactNode
 }) {
   return (

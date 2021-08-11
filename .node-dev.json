@@ -1,6 +1,0 @@
-{
-  "notify": false,
-  "extensions": {
-    "ts": "esbuild-register"
-  }
-}

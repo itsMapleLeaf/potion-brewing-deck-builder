@@ -1,16 +1,17 @@
 import clsx from "clsx"
 import produce from "immer"
 import { useState } from "react"
-import { randomRange, range } from "../shared/helpers"
-import { cauldronSpaces } from "./cauldron-spaces"
-import { CauldronSpaceTile } from "./CauldronSpaceTile"
-import { IngredientTile } from "./IngredientTile"
-import type { Piece } from "./piece"
-import { SolidButton } from "./SolidButton"
+import { cauldronSpaces } from "../cauldron/cauldron-space"
+import { CauldronSpaceTile } from "../cauldron/CauldronSpaceTile"
+import { randomRange } from "../common/helpers"
+import { range } from "../common/range"
+import { IngredientTile } from "../ingredient/IngredientTile"
+import type { Ingredient } from "../ingredient/types"
+import { SolidButton } from "../ui/SolidButton"
 
 type GameState = {
-  bag: Piece[]
-  cauldron: Piece[]
+  bag: Ingredient[]
+  cauldron: Ingredient[]
 }
 
 const cherryBombLimit = 7
@@ -54,11 +55,10 @@ export function App() {
         const [piece] = draft.bag.splice(index, 1)
         if (!piece) return
 
-        const emptySpaces = range(0, piece.value - 1).map<Piece>(() => ({
-          kind: "empty",
-          value: 0,
-        }))
-        draft.cauldron.push(...emptySpaces, piece)
+        for (const _ of range(0, piece.value - 1)) {
+          draft.cauldron.push({ kind: "empty", value: 0 })
+        }
+        draft.cauldron.push(piece)
       })
     )
   }

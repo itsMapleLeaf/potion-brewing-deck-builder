@@ -1,9 +1,9 @@
 import clsx from "clsx"
-import type { Dict } from "../shared/types"
-import type { Piece, PieceKind } from "./piece"
+import type { Dict } from "../common/types"
+import type { Ingredient, IngredientKind } from "./types"
 
-export function IngredientTile({ piece }: { piece: Piece }) {
-  const colorClasses: Dict<string, PieceKind> = {
+export function IngredientTile({ piece }: { piece: Ingredient }) {
+  const colorClasses: Dict<string, IngredientKind> = {
     green: clsx`bg-green-600 text-white`,
     orange: clsx`bg-yellow-600 text-white`,
     white: clsx`bg-white text-gray-700`,
