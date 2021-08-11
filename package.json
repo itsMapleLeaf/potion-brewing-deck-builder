@@ -4,7 +4,7 @@
     "dev": "vite",
     "dev-server": "node-dev ./server/main.ts",
     "build": "tsc && vite build",
-    "start": "vite preview",
+    "start": "PORT=3000 sirv dist",
     "start-server": "cross-env NODE_ENV=production node -r esbuild-register ./server/main.ts"
   },
   "dependencies": {
@@ -16,6 +16,7 @@
     "immer": "9.0.5",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
+    "sirv-cli": "1.0.12",
     "socket.io": "4.1.3",
     "socket.io-client": "4.1.3",
     "type-route": "0.6.0"
