@@ -1,15 +1,18 @@
 {
   "private": true,
   "scripts": {
-    "dev": "node-dev ./server/main.ts",
+    "dev": "vite",
+    "dev-server": "node-dev ./server/main.ts",
     "build": "tsc && vite build",
-    "start": "cross-env NODE_ENV=production node -r esbuild-register ./server/main.ts"
+    "start": "vite preview",
+    "start-server": "cross-env NODE_ENV=production node -r esbuild-register ./server/main.ts"
   },
   "dependencies": {
     "cross-env": "7.0.3",
     "esbuild-register": "2.6.0",
     "express": "4.17.1",
     "express-static-gzip": "2.1.1",
+    "immer": "9.0.5",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
     "socket.io": "4.1.3",
