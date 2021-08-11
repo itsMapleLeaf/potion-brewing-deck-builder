@@ -65,7 +65,7 @@ export function App() {
 
   return (
     <main className="flex flex-col items-center w-full max-w-screen-md gap-4 p-4 mx-auto">
-      <section className="flex flex-col items-center p-4 text-center bg-gray-900 rounded-lg">
+      <div className="flex flex-col items-center p-4 text-center bg-gray-900 rounded-lg">
         <h1 className="mb-2 text-2xl font-light">Cauldron</h1>
 
         <p className={getCherryBombLimitClass()}>
@@ -89,7 +89,7 @@ export function App() {
             )
           })}
         </section>
-      </section>
+      </div>
     </main>
   )
 }
