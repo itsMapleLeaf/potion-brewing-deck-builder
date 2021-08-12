@@ -10,6 +10,9 @@ module.exports = {
       DEFAULT: "0 2px 6px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.1)",
     },
     extend: {
+      fontFamily: {
+        sans: `"Rubik", sans-serif`,
+      },
       colors: {
         gray: colors.blueGray,
       },
