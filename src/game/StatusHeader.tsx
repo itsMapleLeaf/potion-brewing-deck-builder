@@ -12,7 +12,7 @@ export function StatusHeader({ state }: { state: GameState }) {
     <section
       className={clsx(
         appSectionCardClass,
-        `flex flex-row gap-4 font-bold leading-tight`
+        `flex flex-row gap-4 font-bold leading-tight justify-center flex-wrap`
       )}
     >
       <p title="Round" className="text-green-400">

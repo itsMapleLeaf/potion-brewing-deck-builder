@@ -56,3 +56,5 @@
 - [ ] animations uwu
 
 - [ ] info button somewhere to show droplet colors & effects
+
+- [ ] move "add ingredient" button to the actual board, instead of a separate disconnected button
