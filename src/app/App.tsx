@@ -11,33 +11,43 @@ import { RubyIcon } from "../ui/RubyIcon"
 import { SolidButton } from "../ui/SolidButton"
 
 type GameState = {
-  round: number
+  roundNumber: number
   victoryPoints: number
   dropletPosition: number
   rubies: number
   bag: Ingredient[]
-  cauldron: Ingredient[]
+  currentScreen: "brewing" | "brewingResults" | "shop"
+  brewingScreen: {
+    bag: Ingredient[]
+    cauldron: Ingredient[]
+  }
 }
 
 const cherryBombLimit = 7
 
+const initialBag: Ingredient[] = [
+  { kind: "orange", value: 1 },
+  { kind: "green", value: 1 },
+  { kind: "white", value: 1 },
+  { kind: "white", value: 1 },
+  { kind: "white", value: 1 },
+  { kind: "white", value: 1 },
+  { kind: "white", value: 2 },
+  { kind: "white", value: 2 },
+  { kind: "white", value: 3 },
+]
+
 const initialState: GameState = {
-  round: 1,
+  roundNumber: 1,
   victoryPoints: 0,
   dropletPosition: 0,
   rubies: 0,
-  bag: [
-    { kind: "green", value: 1 },
-    { kind: "orange", value: 1 },
-    { kind: "white", value: 1 },
-    { kind: "white", value: 1 },
-    { kind: "white", value: 1 },
-    { kind: "white", value: 1 },
-    { kind: "white", value: 2 },
-    { kind: "white", value: 2 },
-    { kind: "white", value: 3 },
-  ],
-  cauldron: [],
+  bag: initialBag,
+  currentScreen: "brewing",
+  brewingScreen: {
+    bag: initialBag,
+    cauldron: [],
+  },
 }
 
 const appSectionCardClass = "p-4 bg-gray-900 rounded-lg"
@@ -45,7 +55,66 @@ const appSectionCardClass = "p-4 bg-gray-900 rounded-lg"
 export function App() {
   const [state, setState] = useState(initialState)
 
-  const cherryValue = state.cauldron
+  return (
+    <main className="flex flex-col items-center w-full max-w-screen-md gap-4 p-4 mx-auto">
+      <StatusHeader state={state} />
+
+      {state.currentScreen === "brewing" && (
+        <BrewingScreen
+          {...state.brewingScreen}
+          onAddIngredient={() => {
+            setState(
+              produce((draft) => {
+                const index = randomRange(0, draft.brewingScreen.bag.length - 1)
+                const [piece] = draft.brewingScreen.bag.splice(index, 1)
+                if (!piece) return
+
+                for (const _ of range(0, piece.value - 1)) {
+                  draft.brewingScreen.cauldron.push({ kind: "empty", value: 0 })
+                }
+                draft.brewingScreen.cauldron.push(piece)
+              })
+            )
+          }}
+        />
+      )}
+    </main>
+  )
+}
+
+function StatusHeader({ state }: { state: GameState }) {
+  return (
+    <section
+      className={clsx(
+        appSectionCardClass,
+        `flex flex-row gap-4 font-bold leading-tight`
+      )}
+    >
+      <p title="Round" className="text-green-400">
+        <PotionIcon /> {state.roundNumber}
+      </p>
+      <p title="Victory Points" className="text-yellow-400">
+        <StarIcon /> {state.victoryPoints}
+      </p>
+      <p title="Droplet Position" className="text-blue-400">
+        <DropletIcon /> {state.dropletPosition}
+      </p>
+      <p title="Rubies" className="text-red-400">
+        <RubyIcon /> {state.rubies}
+      </p>
+      <p title="Bag Size" className="text-white">
+        <BagIcon /> {state.bag.length}
+      </p>
+    </section>
+  )
+}
+
+function BrewingScreen({
+  bag,
+  cauldron,
+  onAddIngredient,
+}: GameState["brewingScreen"] & { onAddIngredient: () => void }) {
+  const cherryValue = cauldron
     .filter((piece) => piece.kind === "white")
     .reduce((count, piece) => count + piece.value, 0)
 
@@ -55,78 +124,33 @@ export function App() {
     return clsx`text-red-400`
   }
 
-  function reset() {
-    setState(initialState)
-  }
-
-  function drawPiece() {
-    setState(
-      produce((draft) => {
-        const index = randomRange(0, draft.bag.length - 1)
-        const [piece] = draft.bag.splice(index, 1)
-        if (!piece) return
-
-        for (const _ of range(0, piece.value - 1)) {
-          draft.cauldron.push({ kind: "empty", value: 0 })
-        }
-        draft.cauldron.push(piece)
-      })
-    )
-  }
-
   return (
-    <main className="flex flex-col items-center w-full max-w-screen-md gap-4 p-4 mx-auto">
-      <section
-        className={clsx(
-          appSectionCardClass,
-          `flex flex-row gap-4 font-bold leading-tight`
-        )}
-      >
-        <p title="Round" className="text-green-400">
-          <PotionIcon /> {state.round}
-        </p>
-        <p title="Victory Points" className="text-yellow-400">
-          <StarIcon /> {state.victoryPoints}
-        </p>
-        <p title="Droplet Position" className="text-blue-400">
-          <DropletIcon /> {state.dropletPosition}
-        </p>
-        <p title="Rubies" className="text-red-400">
-          <RubyIcon /> {state.rubies}
-        </p>
-        <p title="Bag Size" className="text-white">
-          <BagIcon /> {state.bag.length}
-        </p>
-      </section>
+    <section className={appSectionCardClass}>
+      <div className="flex flex-col items-center text-center">
+        <h1 className="mb-2 text-2xl font-light">Cauldron</h1>
 
-      <section className={appSectionCardClass}>
-        <div className="flex flex-col items-center text-center">
-          <h1 className="mb-2 text-2xl font-light">Cauldron</h1>
+        <p className={getCherryBombLimitClass()}>
+          Cherry bomb limit: {cherryValue}/{cherryBombLimit}
+        </p>
 
-          <p className={getCherryBombLimitClass()}>
-            Cherry bomb limit: {cherryValue}/{cherryBombLimit}
-          </p>
+        <p>Remaining ingredients: {bag.length}</p>
 
-          <p>Remaining ingredients: {state.bag.length}</p>
+        <section className="flex gap-2 mt-4">
+          <SolidButton onClick={onAddIngredient}>Add ingredient</SolidButton>
+        </section>
 
-          <section className="flex gap-2 mt-4">
-            <SolidButton onClick={drawPiece}>Add ingredient</SolidButton>
-            <SolidButton onClick={reset}>Reset</SolidButton>
-          </section>
-
-          <section className="flex flex-wrap justify-center gap-3 mt-6">
-            {cauldronSpaces.map((space, index) => {
-              const piece = state.cauldron[index]
-              return (
-                <CauldronSpaceTile key={index} space={space}>
-                  {piece && <IngredientTile piece={piece} />}
-                </CauldronSpaceTile>
-              )
-            })}
-          </section>
-        </div>
-      </section>
-    </main>
+        <section className="flex flex-wrap justify-center gap-3 mt-6">
+          {cauldronSpaces.map((space, index) => {
+            const piece = cauldron[index]
+            return (
+              <CauldronSpaceTile key={index} space={space}>
+                {piece && <IngredientTile piece={piece} />}
+              </CauldronSpaceTile>
+            )
+          })}
+        </section>
+      </div>
+    </section>
   )
 }
 
