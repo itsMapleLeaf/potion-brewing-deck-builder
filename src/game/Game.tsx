@@ -36,7 +36,7 @@ export function Game() {
           }}
           onBlueSkullChoice={(choices, choiceIndex) => {
             setState((state) => {
-              const choice = choiceIndex ? choices[choiceIndex] : null
+              const choice = choiceIndex != null ? choices[choiceIndex] : null
               const remaining = choice ? without(choices, choice) : choices
 
               state = addIngredientsToBrewingBag(state, ...remaining)
