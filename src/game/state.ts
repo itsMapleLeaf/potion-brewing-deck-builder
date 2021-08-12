@@ -124,7 +124,7 @@ export function resolveIngredientEffect(
       .reverse()
       .find(({ piece }) => piece.kind !== "empty")
 
-    if (result?.piece?.kind === "white") {
+    if (result?.piece.kind === "white") {
       state = produce(state, (draft) => {
         draft.brewingScreen.cauldron[result.index] = {
           kind: "empty",
