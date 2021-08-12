@@ -73,23 +73,27 @@ export function drawIngredients(
 }
 
 export function addIngredientToCauldron(state: GameState, piece: Ingredient) {
-  state = produce(state, (draft) => {
+  return produce(state, (draft) => {
     for (const _ of range(0, piece.value - 1)) {
       draft.brewingScreen.cauldron.push({ kind: "empty", value: 0 })
     }
     draft.brewingScreen.cauldron.push(piece)
   })
-
-  return resolveIngredientEffect(state, piece)
 }
 
-export function addIngredientToBrewingBag(state: GameState, piece: Ingredient) {
+export function addIngredientsToBrewingBag(
+  state: GameState,
+  ...ingredients: Ingredient[]
+) {
   return produce(state, (draft) => {
-    draft.brewingScreen.bag.push(piece)
+    draft.brewingScreen.bag.push(...ingredients)
   })
 }
 
-function resolveIngredientEffect(state: GameState, ingredient: Ingredient) {
+export function resolveIngredientEffect(
+  state: GameState,
+  ingredient: Ingredient,
+) {
   // use the "add ingredient" action by default
   state = produce(state, (draft) => {
     draft.brewingScreen.action = { type: "addIngredient" }
@@ -127,7 +131,7 @@ function resolveIngredientEffect(state: GameState, ingredient: Ingredient) {
           value: 0,
         }
       })
-      state = addIngredientToBrewingBag(state, result.piece)
+      state = addIngredientsToBrewingBag(state, result.piece)
     }
   }
 

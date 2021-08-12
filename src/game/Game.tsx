@@ -1,11 +1,13 @@
 import produce from "immer"
 import { useState } from "react"
+import { without } from "../common/helpers"
 import { BrewingScreen } from "./BrewingScreen"
 import {
-  addIngredientToBrewingBag,
+  addIngredientsToBrewingBag,
   addIngredientToCauldron,
   drawIngredients,
   initialGameState,
+  resolveIngredientEffect,
 } from "./state"
 import { StatusHeader } from "./StatusHeader"
 
@@ -28,27 +30,27 @@ export function Game() {
               const ingredient = drawResult.ingredients[0]
               if (!ingredient) return state
 
-              return addIngredientToCauldron(drawResult.state, ingredient)
+              state = addIngredientToCauldron(drawResult.state, ingredient)
+              return resolveIngredientEffect(state, ingredient)
             })
           }}
           onBlueSkullChoice={(choices, choiceIndex) => {
             setState((state) => {
-              for (const [index, choice] of choices.entries()) {
-                if (index !== choiceIndex) {
-                  state = addIngredientToBrewingBag(state, choice)
-                } else {
-                  state = addIngredientToCauldron(state, choice)
-                }
+              const choice = choiceIndex ? choices[choiceIndex] : null
+              const remaining = choice ? without(choices, choice) : choices
+
+              state = addIngredientsToBrewingBag(state, ...remaining)
+
+              if (!choice) {
+                return produce(state, (draft) => {
+                  draft.brewingScreen.action = { type: "addIngredient" }
+                })
               }
+
+              state = addIngredientToCauldron(state, choice)
+              state = resolveIngredientEffect(state, choice)
               return state
             })
-          }}
-          onBlueSkullSkip={() => {
-            setState(
-              produce((draft) => {
-                draft.brewingScreen.action = { type: "addIngredient" }
-              }),
-            )
           }}
         />
       )}

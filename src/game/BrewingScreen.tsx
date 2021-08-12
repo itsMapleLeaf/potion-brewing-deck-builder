@@ -10,8 +10,10 @@ import { cherryBombLimit } from "./state"
 
 type Props = GameState["brewingScreen"] & {
   onAddIngredient: () => void
-  onBlueSkullChoice: (choices: Ingredient[], choiceIndex: number) => void
-  onBlueSkullSkip: () => void
+  onBlueSkullChoice: (
+    choices: Ingredient[],
+    choiceIndex: number | undefined,
+  ) => void
 }
 
 export function BrewingScreen({ action, ...props }: Props) {
@@ -63,7 +65,11 @@ export function BrewingScreen({ action, ...props }: Props) {
                 </li>
               ))}
             </ul>
-            <SolidButton onClick={props.onBlueSkullSkip}>Skip</SolidButton>
+            <SolidButton
+              onClick={() => props.onBlueSkullChoice(action.choices, undefined)}
+            >
+              Skip
+            </SolidButton>
           </div>
         )}
 

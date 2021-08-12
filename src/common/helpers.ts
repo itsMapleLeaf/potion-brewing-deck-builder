@@ -34,3 +34,13 @@ export function pickRandomItems<T>(
 
   return { chosenItems, remainingItems }
 }
+
+export function pickItem<T>(items: T[], index: number) {
+  const remaining = [...items]
+  const picked = remaining.splice(index, 1)[0]
+  return { picked, remaining }
+}
+
+export function without<T>(array: T[], value: T): T[] {
+  return array.filter((item) => item !== value)
+}
