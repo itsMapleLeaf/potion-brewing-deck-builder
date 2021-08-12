@@ -36,6 +36,6 @@ export const initialGameState: GameState = {
   currentScreen: "brewing",
   brewingScreen: {
     bag: initialBag,
-    cauldron: [],
+    cauldron: [{ kind: "water", value: 0 }],
   },
 }

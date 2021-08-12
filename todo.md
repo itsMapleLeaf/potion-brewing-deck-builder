@@ -11,7 +11,9 @@
   - [ ] state: fortune (low pri)
     - [ ] todo: list fortunes here
   - [x] state: cauldron drawing
-    - [ ] add empty chips + droplet
+    - droplet
+      - [x] show droplet on board
+      - [ ] advance it the necessary # of spaces at round start
     - draw ingredient...
       - [x] white
       - [x] green (resolve at end)

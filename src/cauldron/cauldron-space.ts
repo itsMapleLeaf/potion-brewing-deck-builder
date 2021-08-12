@@ -5,6 +5,7 @@ export type CauldronSpace = {
 }
 
 export const cauldronSpaces: CauldronSpace[] = [
+  { shopPoints: 0, victoryPoints: 0 },
   { shopPoints: 1, victoryPoints: 0 },
   { shopPoints: 2, victoryPoints: 0 },
   { shopPoints: 3, victoryPoints: 0 },

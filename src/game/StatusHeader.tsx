@@ -22,7 +22,7 @@ export function StatusHeader({ state }: { state: GameState }) {
         <StarIcon /> {state.victoryPoints}
       </p>
       <p title="Droplet Position" className="text-blue-400">
-        <DropletIcon /> {state.dropletPosition}
+        <DropletIcon size={5} inline /> {state.dropletPosition}
       </p>
       <p title="Rubies" className="text-red-400">
         <RubyIcon /> {state.rubies}
