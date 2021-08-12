@@ -34,6 +34,9 @@ const initialBag: Ingredient[] = [
   { kind: "blue", value: 1 },
   { kind: "blue", value: 2 },
   { kind: "blue", value: 4 },
+  { kind: "yellow", value: 1 },
+  { kind: "yellow", value: 2 },
+  { kind: "yellow", value: 4 },
 ]
 
 export const initialGameState: GameState = {
@@ -87,24 +90,46 @@ export function addIngredientToBrewingBag(state: GameState, piece: Ingredient) {
 }
 
 function resolveIngredientEffect(state: GameState, ingredient: Ingredient) {
-  return produce(state, (draft) => {
-    switch (ingredient.kind) {
-      case "blue": {
-        const { chosenItems, remainingItems } = pickRandomItems(
-          draft.brewingScreen.bag,
-          ingredient.value,
-        )
-        draft.brewingScreen.bag = remainingItems
-        draft.brewingScreen.action = {
-          type: "blueSkullChooseIngredient",
-          choices: chosenItems,
-        }
-        break
-      }
-
-      default: {
-        draft.brewingScreen.action = { type: "addIngredient" }
-      }
-    }
+  // use the "add ingredient" action by default
+  state = produce(state, (draft) => {
+    draft.brewingScreen.action = { type: "addIngredient" }
   })
+
+  if (ingredient.kind === "blue") {
+    state = produce(state, (draft) => {
+      const { chosenItems, remainingItems } = pickRandomItems(
+        draft.brewingScreen.bag,
+        ingredient.value,
+      )
+      draft.brewingScreen.bag = remainingItems
+      draft.brewingScreen.action = {
+        type: "blueSkullChooseIngredient",
+        choices: chosenItems,
+      }
+    })
+  }
+
+  if (ingredient.kind === "yellow") {
+    const result = state.brewingScreen.cauldron
+      .slice(0, -1)
+
+      // store the index in the un-reversed list so we can use it later
+      .map((piece, index) => ({ piece, index }))
+
+      // search starting from the end
+      .reverse()
+      .find(({ piece }) => piece.kind !== "empty")
+
+    if (result?.piece?.kind === "white") {
+      state = produce(state, (draft) => {
+        draft.brewingScreen.cauldron[result.index] = {
+          kind: "empty",
+          value: 0,
+        }
+      })
+      state = addIngredientToBrewingBag(state, result.piece)
+    }
+  }
+
+  return state
 }

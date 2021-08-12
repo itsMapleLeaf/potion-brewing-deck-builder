@@ -16,14 +16,13 @@
       - [ ] advance it the necessary # of spaces at round start
     - draw ingredient...
       - [x] white
-      - [x] green (resolve at end)
       - [x] orange
       - [x] blue -> draw (value) chips and choose to place 1
       - red
         - [ ] if there are 1 or 2 orange chips, +1
         - [ ] if there are 3+ orange chips, +2
-      - yellow
-        - [ ] if last chip was white, return it to bag + make the space empty
+      - [x] yellow: if last chip was white, return it to the bag
+      - [x] green (resolve at end)
       - [ ] purple (resolve at end)
       - [ ] black (resolve at end)
       - [ ] locoweed (lopri): return any chip but white to the bag

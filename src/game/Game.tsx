@@ -47,7 +47,7 @@ export function Game() {
             setState(
               produce((draft) => {
                 draft.brewingScreen.action = { type: "addIngredient" }
-              })
+              }),
             )
           }}
         />

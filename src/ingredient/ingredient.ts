@@ -10,3 +10,4 @@ export type IngredientKind =
   | "orange"
   | "white"
   | "blue"
+  | "yellow"
