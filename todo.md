@@ -1,9 +1,10 @@
-- [ ] status header
+- [x] status header
 
-  - [ ] round #
-  - [ ] vp count
-  - [ ] bag size
-  - [ ] droplet
+  - [x] round #
+  - [x] vp count
+  - [x] droplet
+  - [x] rubies
+  - [x] bag size
 
 - round flow:
 
