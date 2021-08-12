@@ -12,14 +12,25 @@ export function randomRange(min: number, max: number): number {
   return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
-export function removeRandomItems<T>(items: (T | undefined)[], count = 1): T[] {
-  const removedItems: T[] = []
+export function pickRandomItems<T>(
+  items: T[],
+  count = 1,
+): {
+  chosenItems: T[]
+  remainingItems: T[]
+} {
+  const chosenItems: T[] = []
+  const remainingItems: T[] = [...items]
+
   for (let i = 0; i < count; i++) {
-    const index = Math.floor(Math.random() * items.length)
-    const item = items.splice(index, 1)[0]
+    const [item] = remainingItems.splice(
+      randomRange(0, remainingItems.length - 1),
+      1,
+    )
     if (item !== undefined) {
-      removedItems.push(item)
+      chosenItems.push(item)
     }
   }
-  return removedItems
+
+  return { chosenItems, remainingItems }
 }

@@ -1,3 +1,6 @@
+import produce from "immer"
+import { pickRandomItems } from "../common/helpers"
+import { range } from "../common/range"
 import type { Ingredient } from "../ingredient/ingredient"
 
 export type GameState = {
@@ -45,4 +48,63 @@ export const initialGameState: GameState = {
     cauldron: [{ kind: "water", value: 0 }],
     action: { type: "addIngredient" },
   },
+}
+
+export function drawIngredients(
+  state: GameState,
+  count: number,
+): {
+  ingredients: Ingredient[]
+  state: GameState
+} {
+  const { chosenItems, remainingItems } = pickRandomItems(
+    state.brewingScreen.bag,
+    count,
+  )
+
+  state = produce(state, (draft) => {
+    draft.brewingScreen.bag = remainingItems
+  })
+
+  return { ingredients: chosenItems, state }
+}
+
+export function addIngredientToCauldron(state: GameState, piece: Ingredient) {
+  state = produce(state, (draft) => {
+    for (const _ of range(0, piece.value - 1)) {
+      draft.brewingScreen.cauldron.push({ kind: "empty", value: 0 })
+    }
+    draft.brewingScreen.cauldron.push(piece)
+  })
+
+  return resolveIngredientEffect(state, piece)
+}
+
+export function addIngredientToBrewingBag(state: GameState, piece: Ingredient) {
+  return produce(state, (draft) => {
+    draft.brewingScreen.bag.push(piece)
+  })
+}
+
+function resolveIngredientEffect(state: GameState, ingredient: Ingredient) {
+  return produce(state, (draft) => {
+    switch (ingredient.kind) {
+      case "blue": {
+        const { chosenItems, remainingItems } = pickRandomItems(
+          draft.brewingScreen.bag,
+          ingredient.value,
+        )
+        draft.brewingScreen.bag = remainingItems
+        draft.brewingScreen.action = {
+          type: "blueSkullChooseIngredient",
+          choices: chosenItems,
+        }
+        break
+      }
+
+      default: {
+        draft.brewingScreen.action = { type: "addIngredient" }
+      }
+    }
+  })
 }

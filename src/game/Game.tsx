@@ -1,9 +1,12 @@
 import produce from "immer"
 import { useState } from "react"
-import { removeRandomItems } from "../common/helpers"
-import { range } from "../common/range"
 import { BrewingScreen } from "./BrewingScreen"
-import { initialGameState } from "./state"
+import {
+  addIngredientToBrewingBag,
+  addIngredientToCauldron,
+  drawIngredients,
+  initialGameState,
+} from "./state"
 import { StatusHeader } from "./StatusHeader"
 
 export const appSectionCardClass = "p-4 bg-gray-900 rounded-lg"
@@ -19,67 +22,26 @@ export function Game() {
         <BrewingScreen
           {...state.brewingScreen}
           onAddIngredient={() => {
-            setState(
-              produce((draft) => {
-                const [piece] = removeRandomItems(draft.brewingScreen.bag)
-                if (!piece) return
+            setState((state) => {
+              const drawResult = drawIngredients(state, 1)
 
-                for (const _ of range(0, piece.value - 1)) {
-                  draft.brewingScreen.cauldron.push({ kind: "empty", value: 0 })
-                }
-                draft.brewingScreen.cauldron.push(piece)
+              const ingredient = drawResult.ingredients[0]
+              if (!ingredient) return state
 
-                if (piece.kind === "blue") {
-                  const choices = removeRandomItems(
-                    draft.brewingScreen.bag,
-                    piece.value
-                  )
-
-                  draft.brewingScreen.action = {
-                    type: "blueSkullChooseIngredient",
-                    choices,
-                  }
-                } else {
-                  draft.brewingScreen.action = { type: "addIngredient" }
-                }
-              })
-            )
+              return addIngredientToCauldron(drawResult.state, ingredient)
+            })
           }}
           onBlueSkullChoice={(choices, choiceIndex) => {
-            setState(
-              produce((draft) => {
-                for (const [index, choice] of choices.entries()) {
-                  if (index === choiceIndex) {
-                    const piece = choice
-
-                    for (const _ of range(0, piece.value - 1)) {
-                      draft.brewingScreen.cauldron.push({
-                        kind: "empty",
-                        value: 0,
-                      })
-                    }
-
-                    draft.brewingScreen.cauldron.push(choice)
-
-                    if (piece.kind === "blue") {
-                      const choices = removeRandomItems(
-                        draft.brewingScreen.bag,
-                        piece.value
-                      )
-
-                      draft.brewingScreen.action = {
-                        type: "blueSkullChooseIngredient",
-                        choices,
-                      }
-                    } else {
-                      draft.brewingScreen.action = { type: "addIngredient" }
-                    }
-                  } else {
-                    draft.brewingScreen.bag.push(choice)
-                  }
+            setState((state) => {
+              for (const [index, choice] of choices.entries()) {
+                if (index !== choiceIndex) {
+                  state = addIngredientToBrewingBag(state, choice)
+                } else {
+                  state = addIngredientToCauldron(state, choice)
                 }
-              })
-            )
+              }
+              return state
+            })
           }}
           onBlueSkullSkip={() => {
             setState(
