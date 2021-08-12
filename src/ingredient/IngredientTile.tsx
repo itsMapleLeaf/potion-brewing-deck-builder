@@ -7,6 +7,7 @@ export function IngredientTile({ piece }: { piece: Ingredient }) {
   const colorClasses: Dict<string, IngredientKind> = {
     green: clsx`bg-green-600 text-white`,
     orange: clsx`bg-yellow-600 text-white`,
+    blue: clsx`bg-blue-600 text-white`,
     white: clsx`bg-white text-gray-700`,
   }
 
@@ -15,9 +16,9 @@ export function IngredientTile({ piece }: { piece: Ingredient }) {
   if (piece.kind === "water") {
     return (
       <div
-        title="Your droplet"
+        title="This is your droplet, your ingredients start here."
         className={clsx(
-          "flex items-center justify-center w-10 h-10 rounded-full font-bold text-lg bg-blue-600 text-white/75"
+          "flex items-center justify-center w-10 h-10 rounded-full font-bold text-lg bg-blue-600/60 text-white/75"
         )}
       >
         <DropletIcon size={8} inline />

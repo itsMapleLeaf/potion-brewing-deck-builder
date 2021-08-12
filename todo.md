@@ -17,10 +17,8 @@
     - draw ingredient...
       - [x] white
       - [x] green (resolve at end)
-      - orange
-        - [x] 1
-        - [x] 6
-      - [ ] blue -> draw (value) chips and choose to place 1
+      - [x] orange
+      - [x] blue -> draw (value) chips and choose to place 1
       - red
         - [ ] if there are 1 or 2 orange chips, +1
         - [ ] if there are 3+ orange chips, +2
@@ -56,3 +54,5 @@
 - [ ] game ends after 9 rounds
 
 - [ ] animations uwu
+
+- [ ] info button somewhere to show droplet colors & effects

@@ -10,6 +10,9 @@ export type GameState = {
   brewingScreen: {
     bag: Ingredient[]
     cauldron: Ingredient[]
+    action:
+      | { type: "addIngredient" }
+      | { type: "blueSkullChooseIngredient"; choices: Ingredient[] }
   }
 }
 
@@ -25,6 +28,9 @@ const initialBag: Ingredient[] = [
   { kind: "white", value: 2 },
   { kind: "white", value: 2 },
   { kind: "white", value: 3 },
+  { kind: "blue", value: 1 },
+  { kind: "blue", value: 2 },
+  { kind: "blue", value: 4 },
 ]
 
 export const initialGameState: GameState = {
@@ -37,5 +43,6 @@ export const initialGameState: GameState = {
   brewingScreen: {
     bag: initialBag,
     cauldron: [{ kind: "water", value: 0 }],
+    action: { type: "addIngredient" },
   },
 }

@@ -3,4 +3,10 @@ export type Ingredient = {
   value: number
 }
 
-export type IngredientKind = "water" | "green" | "orange" | "white" | "empty"
+export type IngredientKind =
+  | "empty"
+  | "water"
+  | "green"
+  | "orange"
+  | "white"
+  | "blue"
