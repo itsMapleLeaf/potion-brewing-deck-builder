@@ -1,4 +1,4 @@
-import type { Ingredient } from "../ingredient/types"
+import type { Ingredient } from "../ingredient/ingredient"
 
 export type GameState = {
   roundNumber: number

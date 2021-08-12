@@ -1,7 +1,7 @@
 import clsx from "clsx"
 import type { Dict } from "../common/types"
 import { DropletIcon } from "../ui/DropletIcon"
-import type { Ingredient, IngredientKind } from "./types"
+import type { Ingredient, IngredientKind } from "./ingredient"
 
 export function IngredientTile({ piece }: { piece: Ingredient }) {
   const colorClasses: Dict<string, IngredientKind> = {
