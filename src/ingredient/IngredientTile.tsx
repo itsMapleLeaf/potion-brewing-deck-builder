@@ -15,7 +15,7 @@ export function IngredientTile({ piece }: { piece: Ingredient }) {
     <div
       title={`${piece.kind} ${piece.value}`}
       className={clsx(
-        "flex items-center justify-center w-10 h-10 rounded-full shadow font-bold text-lg",
+        "flex items-center justify-center w-10 h-10 rounded-full font-bold text-lg",
         colorClasses[piece.kind]
       )}
     >
